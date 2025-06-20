@@ -18,7 +18,7 @@ export default function Join() {
           <div className="relative bg-gray-100 rounded-lg shadow-sm">
             <input
               placeholder="Entrer un nom d'utilisateur"
-              className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+              className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm  focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
               id="Name"
               type="Name" 
             />
@@ -33,6 +33,28 @@ export default function Join() {
               </svg>
             </span>
           </div>
+        </div>
+
+        <div id="input" className="relative">
+            <label className="block text-gray-800 mb-5" htmlFor="name">Vos rôles</label>
+          
+            <div className="flex items-center mb-4">
+                <input id="default-checkbox" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"/>
+                <label htmlFor="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Chef de projet</label>
+            </div>
+            <div className="flex items-center">
+                <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Product-owner </label>
+            </div>
+            <div className="flex items-center">
+                <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Scrum-master</label>
+            </div>
+            <div className="flex items-center">
+                <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Team</label>
+            </div>
+
         </div>
 
         <div className="flex items-center justify-between">

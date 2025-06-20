@@ -49,7 +49,7 @@ export default function Create() {
             <label className="block text-gray-800 mb-5" htmlFor="name">Vos rôles</label>
           
             <div className="flex items-center mb-4">
-                <input checked id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"/>
+                <input defaultChecked id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"/>
                 <label htmlFor="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Chef de projet</label>
             </div>
             <div className="flex items-center">
@@ -62,7 +62,7 @@ export default function Create() {
             </div>
             <div className="flex items-center">
                 <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Team</label>
+                <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Team/dev</label>
             </div>
 
         </div>
@@ -75,7 +75,7 @@ export default function Create() {
           className="w-fit rounded-lg text-sm px-5 py-2 focus:outline-none h-[50px] border bg-indigo-500 hover:bg-blue-500 focus:bg-blue-500 border-violet-500-violet- text-white focus:ring-4 focus:ring-violet-200 hover:ring-4 hover:ring-violet-100 transition-all duration-300"
           type="button"
         >
-          <div className="flex gap-2 items-center">Save changes</div>
+          <div className="flex gap-2 items-center">Save</div>
         </button>
         <Link
 

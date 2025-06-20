@@ -1,8 +1,16 @@
 import Link from 'next/link';
 export default function Join() {
+    const projectName = 'ACME 1';
+    const projectCode = 'V6GBB5';
   return (
-    <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8 shadow-md bg-white mt-25">
+    <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8 shadow-md bg-white">
       <div className="mx-auto max-w-lg text-center">
+            <div className="max-w-md mx-auto p-6 space-y-4">
+            {/* Nom du projet */}
+            <div className="text-center mb-4">
+              <h1 className="text-2xl font-bold">{projectName}</h1>
+              <p className="text-sm text-gray-500">Code : {projectCode}</p>
+            </div>
         <h1 className="text-2xl font-bold sm:text-3xl">Bienvenue !</h1>
         <p className="mt-4 text-gray-600">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Et libero
@@ -69,6 +77,7 @@ export default function Join() {
             <Link href="/" className="text-sm text-gray-600 hover:underline">Annuler</Link>
           </div>
       </form>
+    </div>
     </div>
   );
 }

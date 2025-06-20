@@ -1,22 +1,33 @@
-// app/project/[code]/stories/page.tsx (App Router)
-import { mockUserStories } from '../../lib/data';
-import React from 'react';
+'use client';
+
+import { useState } from 'react';
+import { mockUserStories } from '../../lib/data'; // ajuste le chemin selon ton projet
 
 export default function UserStoriesPage() {
+  const itemsPerPage = 5;
+  const [page, setPage] = useState(1);
+
+  const totalPages = Math.ceil(mockUserStories.length / itemsPerPage);
+  const startIndex = (page - 1) * itemsPerPage;
+  const currentStories = mockUserStories.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Liste des User Stories</h1>
 
-      <div className="grid gap-4">
-        {mockUserStories.map((story) => (
+      <div className="grid gap-4 mb-6">
+        {currentStories.map((story) => (
           <div
             key={story.id}
             className="border rounded-xl p-4 shadow bg-white hover:shadow-md transition"
           >
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-xl font-semibold">{story.title}</h2>
-              <span className={`text-sm px-2 py-1 rounded-full 
-                ${getPriorityColor(story.priority)}`}>
+              <span
+                className={`text-sm px-2 py-1 rounded-full ${getPriorityColor(
+                  story.priority
+                )}`}
+              >
                 {story.priority}
               </span>
             </div>
@@ -26,6 +37,27 @@ export default function UserStoriesPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-3">
+        <button
+          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          disabled={page === 1}
+          className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+        >
+          ⬅️ Précédent
+        </button>
+        <span className="text-sm text-gray-700">
+          Page {page} / {totalPages}
+        </span>
+        <button
+          onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          disabled={page === totalPages}
+          className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+        >
+          Suivant ➡️
+        </button>
       </div>
     </div>
   );

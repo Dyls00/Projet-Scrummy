@@ -1,29 +1,29 @@
-'use client'
+'use client' // si tu es dans le dossier /app
 
-import React from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 
-export default function HomePage() {
-  const [data, setData] = React.useState<{ id: number; libelle: string }[]>([])
+export default function Roles() {
+  const [roles, setRoles] = useState<any[]>([])
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const { data: someData, error } = await supabase
-        .from('priorite')
-        .select('*')
-
-      if (error) console.error('Error fetching data:', error)
-      else setData(someData)
+  useEffect(() => {
+    const fetchRoles = async () => {
+      const { data, error } = await supabase.from('priorite').select('*')
+      if (error) console.error(error)
+      else setRoles(data)
     }
 
-    fetchData()
+    fetchRoles()
   }, [])
 
   return (
     <div>
-      {data.map((item) => (
-        <div key={item.id}>{item.libelle}</div>
-      ))}
+      <h2 className="text-xl font-bold">Roles</h2>
+      <ul>
+        {roles.map(role => (
+          <li key={role.id}>{role.libelle}</li>
+        ))}
+      </ul>
     </div>
   )
 }

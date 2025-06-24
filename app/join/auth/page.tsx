@@ -1,83 +1,100 @@
-import Link from 'next/link';
-export default function Join() {
-    const projectName = 'ACME 1';
-    const projectCode = 'V6GBB5';
+'use client'
+
+import { useState } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation' // 👈 Importer le hook
+import Link from 'next/link'
+
+export default function CreateUserForm() {
+  const supabase = createClientComponentClient()
+  const router = useRouter() // 👈 Initialiser le router
+
+  const [name, setName] = useState('')
+  const [roles, setRoles] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const idProjet = 1
+  const valide = true
+
+  const handleCheckboxChange = (role: string) => {
+    if (roles.includes(role)) {
+      setRoles(roles.filter((r) => r !== role))
+    } else {
+      setRoles([...roles, role])
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    const { error } = await supabase.from('user').insert({
+      name: name.trim(),
+      roles,
+      valide,
+      id_projet: idProjet,
+    })
+
+    if (error) {
+      setError(error.message)
+    } else {
+      // ✅ Redirection après succès
+      router.push('/dashboard')
+    }
+
+    setLoading(false)
+  }
+
   return (
-    <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8 shadow-md bg-white">
-      <div className="mx-auto max-w-lg text-center">
-            <div className="max-w-md mx-auto p-6 space-y-4">
-            {/* Nom du projet */}
-            <div className="text-center mb-4">
-              <h1 className="text-2xl font-bold">{projectName}</h1>
-              <p className="text-sm text-gray-500">Code : {projectCode}</p>
-            </div>
-        <h1 className="text-2xl font-bold sm:text-3xl">Bienvenue !</h1>
-        <p className="mt-4 text-gray-600">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Et libero
-          nulla eaque error neque ipsa culpa autem, at itaque nostrum!
-        </p>
-      </div>
+    <div className="max-w-xl mt-15 mx-auto px-6 py-12 bg-white shadow rounded-lg">
+      <h1 className="text-2xl font-semibold text-center mb-4">Bienvenue !</h1>
+      <h2 className="text-2xl font-semibold text-center mb-4">Veuillez indiquer un pseudo !</h2>
 
-      <form className="mx-auto mb-0 bg mt-8 max-w-md space-y-4" action="#">
+      {error && <p className="text-red-600 mb-4">{error}</p>}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="sr-only" htmlFor="Name">
-            Nom d'utilisateur
-          </label>
-          <div className="relative bg-gray-100 rounded-lg shadow-sm">
-            <input
-              placeholder="Entrer un nom d'utilisateur"
-              className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm  focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"
-              id="Name"
-              type="Name" 
-            />
-            <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
-              <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-gray-400"
-                xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                  strokeWidth="2"
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                ></path>
-              </svg>
-            </span>
-          </div>
+          <label htmlFor="name" className="block font-medium mb-1"></label>
+          <input
+            id="name"
+            type="text"
+            value={name}
+            required
+            onChange={(e) => setName(e.target.value)}
+            className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder='Entrez votre pseudo'
+          />
         </div>
 
-        <div id="input" className="relative">
-            <label className="block text-gray-800 mb-5" htmlFor="name">Vos rôles</label>
-          
-            <div className="flex items-center mb-4">
-                <input id="default-checkbox" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150"/>
-                <label htmlFor="default-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Chef de projet</label>
+        <div>
+          <label className="block font-medium mb-2">Rôles</label>
+          {['Chef de projet', 'Product-owner', 'Scrum-master', 'Team'].map((role) => (
+            <div key={role} className="flex items-center mb-2">
+              <input
+                type="checkbox"
+                id={role}
+                checked={roles.includes(role)}
+                onChange={() => handleCheckboxChange(role)}
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+              />
+              <label htmlFor={role} className="ml-2 text-sm text-gray-700">{role}</label>
             </div>
-            <div className="flex items-center">
-                <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Product-owner </label>
-            </div>
-            <div className="flex items-center">
-                <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Scrum-master</label>
-            </div>
-            <div className="flex items-center">
-                <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Team</label>
-            </div>
-
+          ))}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex justify-between items-center">
           <button
-            className="inline-block rounded-lg bg-indigo-500 px-49 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             type="submit"
+            disabled={loading}
+            className="bg-indigo-600 text-white px-5 py-2 rounded hover:bg-indigo-700 disabled:opacity-50"
           >
-            Rejoindre
+            {loading ? 'Enregistrement...' : 'Enregistrer'}
           </button>
+          <Link href="/" className="text-sm text-gray-600 hover:underline">Annuler</Link>
         </div>
-        <div className="flex justify-center mt-4">
-            <Link href="/" className="text-sm text-gray-600 hover:underline">Annuler</Link>
-          </div>
       </form>
     </div>
-    </div>
-  );
+  )
 }

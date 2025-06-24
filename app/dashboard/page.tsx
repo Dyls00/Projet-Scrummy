@@ -69,7 +69,7 @@ export default function DashboardPage() {
         <Button label="Participer au Daily" href="/dashboard/daily/productivite" color="bg-blue-300" />
         <Button label="Quitter la partie" href="/" color="bg-blue-500" />
         <Button label="Gérer les sprints" href="/dashboard/sprints/delete" color="bg-green-300" />
-        <Button label="Gérer le Daily" href="/dashboard/daily/close" color="bg-green-400" />
+        <Button label="Gérer le Daily" href="/dashboard/daily/delete" color="bg-green-400" />
         <Button label="Gérer les stories" href="/dashboard/stories/delete" color="bg-purple-300" />
         <Button label="Gérer les participants" href="/dashboard/participants" color="bg-yellow-300" />
       </div>

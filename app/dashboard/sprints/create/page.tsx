@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '../../../lib/supabaseClient';
 
 export default function CreateSprintPage() {
   const router = useRouter();
@@ -10,14 +11,47 @@ export default function CreateSprintPage() {
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [projectId, setProjectId] = useState<number | null>(null);
+  const [projects, setProjects] = useState<{ id: number; titre: string }[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Récupère les projets disponibles
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const { data, error } = await supabase.from('projet').select('id, titre');
+      if (!error && data) {
+        setProjects(data);
+      } else {
+        console.error('Erreur chargement projets :', error);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const sprint = { title, description, startDate, endDate };
-    console.log('Sprint créé :', sprint);
 
-    // TODO : POST vers /api/sprints
-    router.push('/dashboard/sprints');
+    if (!projectId) {
+      alert('Veuillez sélectionner un projet.');
+      return;
+    }
+
+    const { error } = await supabase.from('sprint').insert([
+      {
+        nom: title,
+        decription: description,
+        date_debut: startDate,
+        date_fin: endDate,
+        id_projet: projectId,
+      },
+    ]);
+
+    if (error) {
+      console.error('Erreur Supabase :', error);
+      alert('Erreur lors de la création du sprint.');
+    } else {
+      alert('Sprint créé avec succès !');
+      router.push('/dashboard/sprints');
+    }
   };
 
   return (
@@ -29,6 +63,23 @@ export default function CreateSprintPage() {
         <FormField label="Description" type="textarea" value={description} setValue={setDescription} />
         <FormField label="Date de début" type="date" value={startDate} setValue={setStartDate} />
         <FormField label="Date de fin" type="date" value={endDate} setValue={setEndDate} />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Projet lié</label>
+          <select
+            value={projectId ?? ''}
+            onChange={(e) => setProjectId(Number(e.target.value))}
+            className="w-full border rounded px-3 py-2 shadow-sm"
+            required
+          >
+            <option value="" disabled>-- Sélectionnez un projet --</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.titre}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="text-right">
           <button

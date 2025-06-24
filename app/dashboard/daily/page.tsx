@@ -1,66 +1,95 @@
 'use client';
 
-import { useState } from 'react';
-import { mockDailys } from '../../lib/data';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabaseClient';
+
+type DailyEntry = {
+  id: number;
+  created_at: string;
+  nom: string | null;
+  productivite: number | null;
+  alea: string | null;
+  id_storie: number | null;
+  validation_qcm: number | null;
+  // Optionnel, si jointure ajoutée
+  storie?: { titre: string };
+  qcm?: { /* champs selon ta table qcm */ };
+};
 
 export default function DailyPage() {
   const itemsPerPage = 3;
   const [page, setPage] = useState(1);
+  const [dailys, setDailys] = useState<DailyEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const totalPages = Math.ceil(mockDailys.length / itemsPerPage);
+  useEffect(() => {
+    fetchDailys();
+  }, []);
+
+  async function fetchDailys() {
+    setLoading(true);
+    setError('');
+    const { data, error } = await supabase
+      .from('daily')
+      // Jointure sur storie pour récupérer titre
+      .select('id, created_at, nom, productivite, alea, id_storie, validation_qcm, storie(titre)')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      setError('Erreur lors du chargement des dailys.');
+      console.error(error);
+    } else if (data) {
+      // Corrige la structure de 'storie' (tableau -> objet ou undefined)
+      const fixedData = data.map((daily: any) => ({
+        ...daily,
+        storie: daily.storie && Array.isArray(daily.storie) ? daily.storie[0] : daily.storie,
+      }));
+      setDailys(fixedData);
+    }
+    setLoading(false);
+  }
+
+  const totalPages = Math.ceil(dailys.length / itemsPerPage);
   const startIndex = (page - 1) * itemsPerPage;
-  const currentDailys = mockDailys.slice(startIndex, startIndex + itemsPerPage);
+  const currentDailys = dailys.slice(startIndex, startIndex + itemsPerPage);
+
+  if (loading) return <div>Chargement...</div>;
+  if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Historique des Dailys</h1>
 
       {currentDailys.map((daily) => (
-        <div key={daily.date} className="mb-6">
+        <div key={daily.id} className="mb-6 border p-4 rounded shadow-sm hover:shadow-md transition">
           <h2 className="text-lg font-semibold text-gray-700 mb-2">
-            📅 {formatDate(daily.date)}
+            📅 {formatDate(daily.created_at)}
           </h2>
 
-          <div className="grid gap-4">
-            {daily.entries.map((entry, idx) => (
-              <div
-                key={idx}
-                className="border rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="text-md font-bold text-indigo-600">{entry.participantName}</h3>
-                  <span className="text-sm text-gray-500 italic">{entry.qcmType.toUpperCase()}</span>
-                </div>
+          <p className="text-md font-bold text-indigo-600 mb-1">{daily.nom}</p>
 
-                <p className="text-sm text-gray-800 mb-1">
-                  🧩 Story : <span className="font-medium">{entry.storyTitle}</span>
-                </p>
+          <p className="text-sm text-gray-800 mb-1">
+            🧩 Story : <span className="font-medium">{daily.storie?.titre ?? 'Inconnue'}</span>
+          </p>
 
-                <p className="text-sm text-gray-600">
-                  ⚙️ Productivité : {entry.productivity} pts
-                </p>
+          <p className="text-sm text-gray-600 mb-1">
+            ⚙️ Productivité : {daily.productivite ?? 'N/A'} pts
+          </p>
 
-                <p className="text-sm text-gray-600">
-                  🎲 Aléa : <span className="italic">{entry.alea}</span>
-                </p>
+          <p className="text-sm text-gray-600 mb-1">
+            🎲 Aléa : <span className="italic">{daily.alea ?? '-'}</span>
+          </p>
 
-                <p className="text-sm text-gray-600">
-                  ✅ Validation :{' '}
-                  <span className={entry.valid ? 'text-green-600' : 'text-red-600'}>
-                    {entry.valid ? 'Réussie' : 'Échouée'}
-                  </span>
-                </p>
-              </div>
-            ))}
-          </div>
+          <p className="text-sm text-gray-600 mb-1">
+            ✅ Validation QCM : <span>{daily.validation_qcm ?? 'N/A'}</span>
+          </p>
         </div>
       ))}
 
-      {/* Pagination */}
       <div className="flex justify-center items-center gap-3 mt-8">
         <button
-          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page === 1}
           className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
         >
@@ -72,7 +101,7 @@ export default function DailyPage() {
         </span>
 
         <button
-          onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           disabled={page === totalPages}
           className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
         >
@@ -83,7 +112,7 @@ export default function DailyPage() {
   );
 }
 
-function formatDate(dateString: string): string {
+function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString('fr-FR', {
     weekday: 'long',
     day: '2-digit',

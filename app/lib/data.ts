@@ -1,36 +1,5 @@
 // lib/data.tsx
 
-import postgres from 'postgres';
-import { Role } from './definitions';
-
-const sql = postgres(process.env.DATABASE_URL as string, {
-  ssl: 'prefer',
-})
-
-export default sql
-
-
-export async function fetchRole() {
-  try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
-    // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    const data = await sql<Role[]>`SELECT * FROM role`;
-
-    // console.log('Data fetch completed after 3 seconds.');
-
-    return data;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch role data.');
-  }
-}
- 
-// ...
-
 export const userStoryPriorities = ['MUST', 'SHOULD', 'COULD', 'WOULD'] as const;
 export type Priority = typeof userStoryPriorities[number];
 

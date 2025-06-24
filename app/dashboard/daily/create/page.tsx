@@ -1,129 +1,219 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { mockParticipants, mockUserStories } from "../../../lib/data";
-import { useRouter } from "next/navigation";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import React, { useState, useEffect } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-export default function CreateDailyPage() {
-  const [date, setDate] = useState("");
-  const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
-    []
-  );
-  const router = useRouter();
-  const [selectedStory, setSelectedStory] = useState<string>("");
+type Storie = { id: number; titre: string };
+type Qcm = { id: number; titre: string };
+type User = { id: number; name: string };
 
-  const handleSubmit = (e: React.FormEvent) => {
+export default function DailyCreatePage() {
+  const supabase = createClientComponentClient();
+
+  const [nom, setNom] = useState('');
+  const [productivite, setProductivite] = useState<string>('');
+  const [alea, setAlea] = useState('');
+  const [idStorie, setIdStorie] = useState<number | null>(null);
+  const [validationQcm, setValidationQcm] = useState<number | null>(null);
+  const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
+
+  const [stories, setStories] = useState<Storie[]>([]);
+  const [qcms, setQcms] = useState<Qcm[]>([]);
+  const [participants, setParticipants] = useState<User[]>([]);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  // Chargement des données au montage
+  useEffect(() => {
+    fetchStories();
+    fetchQcms();
+    fetchParticipants();
+  }, []);
+
+  async function fetchStories() {
+    const { data, error } = await supabase.from('storie').select('id, titre').order('titre');
+    if (error) {
+      console.error('Erreur chargement stories', error);
+    } else if (data) {
+      setStories(data);
+    }
+  }
+
+  async function fetchQcms() {
+    const { data, error } = await supabase.from('qcm').select('id, titre').order('titre');
+    if (error) {
+      console.error('Erreur chargement qcms', error);
+    } else if (data) {
+      setQcms(data);
+    }
+  }
+
+  async function fetchParticipants() {
+    const { data, error } = await supabase.from('user').select('id, name').order('name');
+    if (error) {
+      console.error('Erreur chargement participants', error);
+    } else if (data) {
+      setParticipants(data);
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
 
-    const daily = {
-      date,
-      participants: selectedParticipants,
-      storyId: selectedStory,
-    };
+    if (!nom.trim()) {
+      setError('Le nom est obligatoire.');
+      return;
+    }
+    if (productivite !== '' && (isNaN(Number(productivite)) || Number(productivite) < 0)) {
+      setError('La productivité doit être un nombre positif.');
+      return;
+    }
 
-    console.log("Daily créé :", daily);
+    setLoading(true);
 
-    // TODO: Envoyer vers une API ou stocker ailleurs
-    router.push("/dashboard/daily");
-  };
+    // Création du daily
+    const { data: dailyData, error: dailyError } = await supabase
+      .from('daily')
+      .insert({
+        nom: nom.trim(),
+        productivite: productivite === '' ? null : Number(productivite),
+        alea: alea.trim() === '' ? null : alea.trim(),
+        id_storie: idStorie,
+        validation_qcm: validationQcm,
+      })
+      .select('id')
+      .single();
 
-  const toggleSelection = (
-    id: string,
-    selected: string[],
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>
-  ) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
+    if (dailyError) {
+      setLoading(false);
+      setError('Erreur lors de la création du daily : ' + dailyError.message);
+      return;
+    }
+
+    const idDaily = dailyData.id;
+
+    // Insérer dans user_daily les participants sélectionnés
+    if (selectedParticipants.length > 0) {
+      const userDailyRows = selectedParticipants.map((userId) => ({
+        id_daily: idDaily,
+        id_user: userId,
+      }));
+
+      const { error: userDailyError } = await supabase.from('user_daily').insert(userDailyRows);
+
+      if (userDailyError) {
+        setLoading(false);
+        setError('Erreur lors de l\'ajout des participants : ' + userDailyError.message);
+        return;
+      }
+    }
+
+    setLoading(false);
+    setSuccess('Daily créé avec succès !');
+
+    // Reset formulaire
+    setNom('');
+    setProductivite('');
+    setAlea('');
+    setIdStorie(null);
+    setValidationQcm(null);
+    setSelectedParticipants([]);
+  }
 
   return (
-    <div className="max-w-xl mx-auto p-6 mt-10">
-      <h1 className="text-2xl font-bold mb-4">Créer un Daily</h1>
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow">
+      <h1 className="text-2xl font-bold mb-6">Créer un Daily</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Date */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date du Daily
-          </label>
+      {error && <p className="mb-4 text-red-600">{error}</p>}
+      {success && <p className="mb-4 text-green-600">{success}</p>}
+
+      <form onSubmit={handleSubmit}>
+
+        <div className="mb-4">
+          <label className="block font-medium mb-1">Nom du Daily *</label>
           <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            type="text"
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
             required
-            className="w-full border rounded px-3 py-2 shadow"
           />
         </div>
 
-        {/* Participants */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Participants
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            {mockParticipants.map((p) => (
-              <button
-                type="button"
-                key={p.id}
-                className={`px-3 py-2 rounded border ${
-                  selectedParticipants.includes(p.id)
-                    ? "bg-blue-200 border-blue-500"
-                    : "bg-gray-100"
-                }`}
-                onClick={() =>
-                  toggleSelection(
-                    p.id,
-                    selectedParticipants,
-                    setSelectedParticipants
-                  )
-                }
-              >
-                {p.name}
-              </button>
-            ))}
-          </div>
+        <div className="mb-4">
+          <label className="block font-medium mb-1">Productivité (pts)</label>
+          <input
+            type="number"
+            min="0"
+            value={productivite}
+            onChange={(e) => setProductivite(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+          />
         </div>
 
-        {/* Stories */}
-        <div id="input" className="relative">
-          <label className="block text-gray-800 mb-2" htmlFor="story">
-            Story du jour
-          </label>
-          <div className="grid grid-cols-1 rounded-md outline outline-1 -outline-offset-1 outline-gray-300 has-[select:focus]:outline-2 has-[select:focus]:-outline-offset-2 has-[select:focus]:outline-indigo-600 focus-within:relative">
-            <select
-              id="story"
-              name="story"
-              value={selectedStory}
-              onChange={(e) => setSelectedStory(e.target.value)}
-              className="col-start-1 row-start-1 w-full appearance-none rounded-md py-1.5 pr-7 pl-3 text-base text-gray-500 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
-            >
-              <option value="" disabled>
-                -- Choisir une story --
-              </option>
-              {mockUserStories.map((story) => (
-                <option key={story.id} value={story.id}>
-                  {story.title}
-                </option>
-              ))}
-            </select>
-            <ChevronDownIcon
-              aria-hidden="true"
-              className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-            />
-          </div>
+        <div className="mb-4">
+          <label className="block font-medium mb-1">Aléa</label>
+          <input
+            type="text"
+            value={alea}
+            onChange={(e) => setAlea(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+          />
         </div>
 
-        {/* Submit */}
-        <div className="text-right">
-          <button
-            type="submit"
-            className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
+        <div className="mb-4">
+          <label className="block font-medium mb-1">Story liée</label>
+          <select
+            value={idStorie ?? ''}
+            onChange={(e) => setIdStorie(e.target.value ? Number(e.target.value) : null)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
           >
-            Créer le Daily
-          </button>
+            <option value="">-- Choisir une story --</option>
+            {stories.map((story) => (
+              <option key={story.id} value={story.id}>
+                {story.titre}
+              </option>
+            ))}
+          </select>
         </div>
+
+        <div className="mb-6">
+          <label className="block font-medium mb-2">Participants</label>
+          <div className="max-h-40 overflow-y-auto border rounded p-2">
+            {participants.map((participant) => (
+              <label key={participant.id} className="block mb-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  value={participant.id}
+                  checked={selectedParticipants.includes(participant.id)}
+                  onChange={(e) => {
+                    const id = participant.id;
+                    if (e.target.checked) {
+                      setSelectedParticipants([...selectedParticipants, id]);
+                    } else {
+                      setSelectedParticipants(selectedParticipants.filter((pid) => pid !== id));
+                    }
+                  }}
+                  className="mr-2"
+                />
+                {participant.name}
+              </label>
+            ))}
+            {participants.length === 0 && <p className="text-gray-500">Aucun participant trouvé.</p>}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded"
+        >
+          {loading ? 'Création en cours...' : 'Créer le Daily'}
+        </button>
       </form>
     </div>
   );

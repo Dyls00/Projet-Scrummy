@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { supabase } from '../../../../../lib/supabaseClient';
+import { supabase } from '../../../../../../lib/supabaseClient';
 
 export default function EditStoryPage() {
   const searchParams = useSearchParams();

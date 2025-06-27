@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockParticipants, mockUserStories, mockDailyToEdit } from '../../../../../lib/data';
+import { mockParticipants, mockUserStories, mockDailyToEdit } from '../../../../../../lib/data';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export default function EditDailyPage() {

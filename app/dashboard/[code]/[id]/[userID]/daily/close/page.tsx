@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { mockCurrentDaily } from '../../../../../lib/data';
+import { mockCurrentDaily } from '../../../../../../lib/data';
 
 export default function CloseDailyPage() {
   const router = useRouter();

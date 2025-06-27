@@ -70,7 +70,6 @@ export default function DashboardPageAuth() {
           {loading ? 'Chargement...' : projectName}
         </h1>
         <p className="text-sm text-gray-500">Code : {loading ? 'Chargement...' : projectCode}</p>
-        <p className="text-sm text-gray-500">ID : {loading ? 'Chargement...' : userId}</p>
       </div>
 
       {/* Tabs */}

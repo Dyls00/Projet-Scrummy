@@ -51,3 +51,5 @@
 - Questions techniques
 
 - **/!\ Gestion de l'IA** : toute question dont la réponse serait "je ne sais pas, c'est l'IA qui a écrit ce code" <u><em>entraîne un 0 immédiat</em></u>. L'IA est là pour vous faire gagner du temps, pas pour écrire du code que vous ne maîtrisez pas!
+
+Auto évalué : 11pts

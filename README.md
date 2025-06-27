@@ -42,7 +42,7 @@
 ## Livrables
 
 - Repository Git
-  - README avec URL de l'app déployée.: 
+  - README avec URL de l'app déployée.: https://projet-scrummy-dyls00s-projects.vercel.app/
 
 ## Soutenance
 

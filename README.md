@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Projet Full-Stack (back + front) E3 DAD
 
-## Getting Started
+## Grille technique
 
-First, run the development server:
+- Le projet doit utiliser NextJS : fait
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Le projet sera déployé chez Vercel (App + BDD) : fait
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Grille backend
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- La BDD peut être SQL ou noSQL (au choix, argumenté) : Sql
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- La BDD doit être gérée avec un framework. Le versionning du schéma doit être géré. Par exemple:
+  
+  - v1 :
+    
+    - on peut répondre à un QCM seulement en mode carré
+    
+    - la capacité d'un sprint est définie manuellement avec un champs *capacity*. : fait
+    
+    - il existe au moins 1 projet en BDD avec cette v1 (avec au moins 1 sprint, 1 story, 1 participant, 1 daily, etc.) : fait
+  
+  - v2:
+    
+    - réponses aux QCM en mode cash/carré/duo
+    
+    - la capacité d'un sprint est calculée avec les dates de début/fin. Le champs *capcity* n'existe plus.
+    
+    - il existe au moins 1 projet en BDD avec cette v2 : fait
+    
+    - le projet v1 existe encore
 
-## Learn More
+- Les exigences fonctionnelles de l'app sont respectées (cf **features**)
 
-To learn more about Next.js, take a look at the following resources:
+- Le projet doit avoir des tests unitaires pour la logique métier
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Grille frontend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Les exigences fonctionnelles de l'app sont respectées (cf **features**) : fait
+- Le projet doit avoir des tests composants pour l' : fait
 
-## Deploy on Vercel
+## Livrables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Repository Git
+  - README avec URL de l'app déployée.: 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Soutenance
+
+- Présentation des résultats (démo + revue de code) (environ 15 min)
+
+- Questions techniques
+
+- **/!\ Gestion de l'IA** : toute question dont la réponse serait "je ne sais pas, c'est l'IA qui a écrit ce code" <u><em>entraîne un 0 immédiat</em></u>. L'IA est là pour vous faire gagner du temps, pas pour écrire du code que vous ne maîtrisez pas!
